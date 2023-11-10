@@ -41,11 +41,30 @@ class MinMaxScaler:
         self.max = None
 
     def fit(self, data):
-        self.min = torch.min(data, dim=0).values
-        self.max = torch.max(data, dim=0).values
+        self.min = nanminmax(data, 'min', dim=0)
+        self.max = nanminmax(data, 'max', dim=0)
 
     def transform(self, data):
         return (data - self.min) / (self.max - self.min)
+
+    def fit_transform(self, data):
+        self.fit(data)
+        return self.transform(data)
+    
+
+class QuantileTransformer:
+    def __init__(self, n_quantiles=100):
+        self.n_quantiles = n_quantiles
+        self.quantiles = None
+
+    def fit(self, data):
+        self.quantiles = torch.quantile(data, torch.linspace(0, 1, self.n_quantiles))
+
+    def transform(self, data):
+        sorted_data = torch.sort(data, dim=0).values
+        ranks = torch.searchsorted(self.quantiles, sorted_data)
+        transformed_data = ranks / (self.n_quantiles - 1)
+        return transformed_data
 
     def fit_transform(self, data):
         self.fit(data)
