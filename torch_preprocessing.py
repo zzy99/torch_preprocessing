@@ -45,7 +45,7 @@ class MinMaxScaler:
         self.max = nanminmax(data, 'max', dim=0)
 
     def transform(self, data):
-        return (data - self.min) / (self.max - self.min)
+        return (data - self.min) / (self.max - self.min + 1e-10)
 
     def fit_transform(self, data):
         self.fit(data)
