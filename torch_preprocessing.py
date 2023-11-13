@@ -35,6 +35,18 @@ def zscore(tensor, dim=None):
     return zscore
 
 
+def torch_nan_to_num(input_tensor, nan=0.0, posinf=None, neginf=None):
+    output_tensor = torch.where(torch.isnan(input_tensor), torch.tensor(nan), input_tensor)
+    
+    if posinf is not None:
+        output_tensor = torch.where(torch.isposinf(output_tensor), torch.tensor(posinf), output_tensor)
+    
+    if neginf is not None:
+        output_tensor = torch.where(torch.isneginf(output_tensor), torch.tensor(neginf), output_tensor)
+    
+    return output_tensor
+    
+
 class MinMaxScaler:
     def __init__(self):
         self.min = None
