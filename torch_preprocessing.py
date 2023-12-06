@@ -4,9 +4,10 @@ import torch
 def nanminmax(tensor, operation='min', dim=None, keepdim=False):
     if operation not in ['min','max']:
         raise ValueError("Operation must be 'min' or 'max'.")
+        
     mask = torch.isnan(tensor)
     replacement = float('-inf') if operation == 'max' else float('inf')
-    replacement = torch.tensor(replacement, dtype=tensor.dtype)
+    replacement = torch.tensor(replacement, dtype=tensor.dtype, device=tensor.device)
     tensor_masked = torch.where(mask, replacement, tensor)
     
     if operation == 'min':
@@ -15,7 +16,7 @@ def nanminmax(tensor, operation='min', dim=None, keepdim=False):
         values, _ = torch.max(tensor_masked, dim=dim, keepdim=keepdim)
         
     values = torch.where(torch.all(mask, dim=dim, keepdim=keepdim), torch.tensor(float('nan'), \
-        dtype=tensor.dtype), values)
+        dtype=tensor.dtype, device=tensor.device), values)
     return values
 
 
